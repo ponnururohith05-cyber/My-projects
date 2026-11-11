@@ -18,6 +18,20 @@ This project is split into two parts:
 - Store notes in a JSON file for a lightweight local database
 - CORS-enabled API for local frontend integration
 
+## Screenshots
+
+### Notes dashboard
+
+![Personal Notes Manager dashboard](docs/screenshots/dashboard-empty.png)
+
+### Creating a note
+
+![Creating a note with a title, content, and tag](docs/screenshots/note-creation.png)
+
+### Saved notes
+
+![Saved note displayed in the notes list](docs/screenshots/notes-list.png)
+
 ## Tech Stack
 
 - Python 3.13
