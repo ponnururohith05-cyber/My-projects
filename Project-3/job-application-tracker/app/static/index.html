@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f6f7fb">
+    <title>CareerLog — Job Application Tracker</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="/static/app.js?v=2" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="/" aria-label="CareerLog home">
+          <span class="brand-mark" aria-hidden="true">C</span>
+          <span>career<span class="brand-light">log</span></span>
+        </a>
+        <p class="nav-label">WORKSPACE</p>
+        <nav class="navigation" aria-label="Main navigation">
+          <a class="nav-link active" href="/" data-view="applications">
+            <span aria-hidden="true">▤</span> Applications
+          </a>
+          <a class="nav-link" href="/analytics" data-view="analytics">
+            <span aria-hidden="true">▥</span> Analytics
+          </a>
+        </nav>
+        <div class="sidebar-note">
+          <span class="note-icon" aria-hidden="true">✦</span>
+          <p>Small steps add up. Keep your search moving forward.</p>
+        </div>
+        <div class="sidebar-footer">A clearer view of your next move.</div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div class="breadcrumb"><span>Workspace</span><span class="crumb-divider">/</span><strong id="breadcrumb-current">Applications</strong></div>
+          <label class="user-picker" for="user-id">
+            <span class="avatar" aria-hidden="true">U</span>
+            <span class="user-picker-copy"><strong>Workspace user</strong><small>Existing user ID</small></span>
+            <input id="user-id" type="number" min="1" step="1" value="1" aria-label="Existing user ID">
+          </label>
+        </header>
+
+        <section id="applications-view" class="view">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">YOUR JOB SEARCH</p>
+              <h1>Applications</h1>
+              <p class="subheading">Keep every opportunity organized in one place.</p>
+            </div>
+            <button class="button button-primary" id="new-application" type="button"><span aria-hidden="true">＋</span> Add application</button>
+          </div>
+
+          <div class="stat-grid" aria-label="Application summary">
+            <article class="stat-card">
+              <span class="stat-icon lavender" aria-hidden="true">▤</span>
+              <div><p>Total applications</p><strong id="total-count">—</strong></div>
+              <span class="stat-caption">all time</span>
+            </article>
+            <article class="stat-card">
+              <span class="stat-icon blue" aria-hidden="true">◷</span>
+              <div><p>In interview</p><strong id="interview-count">—</strong></div>
+              <span class="stat-caption">in progress</span>
+            </article>
+            <article class="stat-card">
+              <span class="stat-icon green" aria-hidden="true">✦</span>
+              <div><p>Offers</p><strong id="offer-count">—</strong></div>
+              <span class="stat-caption">great work</span>
+            </article>
+          </div>
+
+          <section class="panel applications-panel" aria-labelledby="applications-title">
+            <div class="panel-heading">
+              <div><h2 id="applications-title">Your applications</h2><p>Search and manage your opportunities.</p></div>
+              <span class="result-count" id="result-count">Loading…</span>
+            </div>
+            <form id="filters" class="filter-row">
+              <label class="search-field"><span aria-hidden="true">⌕</span><input id="filter-company" type="search" maxlength="200" placeholder="Search company"></label>
+              <label class="search-field"><span aria-hidden="true">⌕</span><input id="filter-role" type="search" maxlength="200" placeholder="Search role"></label>
+              <label class="select-field"><span class="sr-only">Filter by status</span><select id="filter-status"><option value="">All statuses</option><option>Applied</option><option>Interview</option><option>Offer</option><option>Rejected</option></select></label>
+              <button class="button button-quiet" type="reset">Clear filters</button>
+            </form>
+
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>COMPANY</th><th>ROLE</th><th>STATUS</th><th>DATE ADDED</th><th><span class="sr-only">Actions</span></th></tr></thead>
+                <tbody id="application-rows"><tr><td class="table-message" colspan="5">Loading applications…</td></tr></tbody>
+              </table>
+            </div>
+            <div class="pagination">
+              <span id="page-summary">—</span>
+              <div class="pagination-buttons">
+                <button class="button button-quiet button-small" id="previous-page" type="button" disabled>← Previous</button>
+                <button class="button button-quiet button-small" id="next-page" type="button" disabled>Next →</button>
+              </div>
+            </div>
+          </section>
+          <p class="footer-note">Your next opportunity could be just around the corner.</p>
+        </section>
+
+        <section id="analytics-view" class="view" hidden>
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">AT A GLANCE</p>
+              <h1>Your progress</h1>
+              <p class="subheading">A little perspective on the work you’ve put in.</p>
+            </div>
+            <label class="period-picker" for="analytics-months"><span>Showing</span>
+              <select id="analytics-months"><option value="6">Last 6 months</option><option value="12" selected>Last 12 months</option></select>
+            </label>
+          </div>
+          <div class="analytics-grid">
+            <section class="panel chart-panel" aria-labelledby="status-chart-title">
+              <div class="panel-heading"><div><h2 id="status-chart-title">Application status</h2><p>Where things stand right now.</p></div></div>
+              <div id="status-chart" class="status-chart"><p class="chart-loading">Loading analytics…</p></div>
+            </section>
+            <section class="panel chart-panel" aria-labelledby="timeline-chart-title">
+              <div class="panel-heading"><div><h2 id="timeline-chart-title">Applications over time</h2><p>Applications added each month.</p></div></div>
+              <div id="timeline-chart" class="timeline-chart"><p class="chart-loading">Loading analytics…</p></div>
+            </section>
+          </div>
+        </section>
+
+        <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+      </main>
+    </div>
+
+    <dialog id="application-dialog" class="application-dialog">
+      <form id="application-form">
+        <div class="dialog-heading">
+          <div><p class="eyebrow">YOUR JOB SEARCH</p><h2 id="dialog-title">Add application</h2></div>
+          <button class="icon-button" id="close-dialog" type="button" aria-label="Close dialog">×</button>
+        </div>
+        <label class="form-field">Company name<input id="company" name="company" required maxlength="200" placeholder="e.g. Northstar Labs"></label>
+        <label class="form-field">Role<input id="role" name="role" required maxlength="200" placeholder="e.g. Product Designer"></label>
+        <label class="form-field">Status<select id="status" name="status"><option>Applied</option><option>Interview</option><option>Offer</option><option>Rejected</option></select></label>
+        <label class="form-field">Notes <span class="optional-label">Optional</span><textarea id="notes" name="notes" rows="4" maxlength="5000" placeholder="A reminder, contact, or follow-up date…"></textarea></label>
+        <div class="dialog-actions"><button class="button button-quiet" id="cancel-dialog" type="button">Cancel</button><button class="button button-primary" id="save-application" type="submit">Save application</button></div>
+      </form>
+    </dialog>
+  </body>
+</html>

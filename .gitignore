@@ -1,0 +1,19 @@
+# Local secrets and environment configuration
+**/.env
+**/.env.*
+!**/.env.example
+
+# Local application data
+**/notes.json
+*.db
+*.sqlite
+*.sqlite3
+
+# Generated files and local tooling
+**/node_modules/
+**/dist/
+**/.venv/
+**/venv/
+**/__pycache__/
+**/.pytest_cache/
+*.py[cod]

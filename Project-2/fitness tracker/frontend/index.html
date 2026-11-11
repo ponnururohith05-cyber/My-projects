@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+<title>Fitness Tracker</title>
+<style>
+body{font-family:Arial;background:#f0f2f5;margin:0;padding:20px}
+.container{max-width:700px;margin:auto}
+.card{background:white;padding:20px;border-radius:12px;margin-bottom:15px;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+input{width:100%;padding:10px;margin:5px 0;box-sizing:border-box;border:1px solid #ddd;border-radius:8px}
+button{background:#22c55e;color:white;border:none;padding:10px 15px;border-radius:8px;cursor:pointer;margin:5px 5px 5px 0}
+button.red{background:#ef4444} button.blue{background:#3b82f6}
+h2{margin-top:0} .row{display:flex;gap:10px} .row>div{flex:1;background:#f8fafc;padding:12px;border-radius:10px;text-align:center}
+.hidden{display:none} .item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🏋️ Fitness Tracker</h1>
+
+<div id="authCard" class="card">
+<h2>Login / Register</h2>
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+<br><button onclick="register()">Register</button>
+<button class="blue" onclick="login()">Login</button>
+<p id="authMsg"></p>
+</div>
+
+<div id="app" class="hidden">
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center"><h2>Today</h2><button class="red" onclick="logout()">Logout</button></div>
+<input type="date" id="dateInput">
+<div class="row">
+<div><b id="eaten">0</b><br>Eaten</div>
+<div><b id="burned">0</b><br>Burned</div>
+<div><b id="net">0</b><br>Net</div>
+<div><b id="protein">0g</b><br>Protein</div>
+</div>
+<button onclick="loadAll()">Refresh</button>
+</div>
+
+<div class="card">
+<h2>🍽️ Add Meal</h2>
+<input id="mealName" placeholder="Meal name e.g. Chicken Rice">
+<input id="mealCal" type="number" placeholder="Calories">
+<input id="mealProtein" type="number" placeholder="Protein (g)">
+<button onclick="addMeal()">Add Meal</button>
+<div id="mealList"></div>
+</div>
+
+<div class="card">
+<h2>💪 Add Workout</h2>
+<input id="workName" placeholder="Workout e.g. Running">
+<input id="workCal" type="number" placeholder="Calories Burned">
+<input id="workDur" type="number" placeholder="Duration (mins)">
+<button onclick="addWorkout()">Add Workout</button>
+<div id="workList"></div>
+</div>
+</div>
+</div>
+
+<script>
+const API="http://127.0.0.1:8001";
+let token=localStorage.getItem("token")||"";
+const dateInput=document.getElementById("dateInput");
+dateInput.value=new Date().toISOString().slice(0,10);
+dateInput.onchange=loadAll;
+function headers(){return {"Content-Type":"application/json","Authorization":"Bearer "+token}}
+function showApp(){document.getElementById("authCard").classList.add("hidden");document.getElementById("app").classList.remove("hidden");loadAll()}
+if(token) showApp();
+async function register(){
+  let r=await fetch(API+"/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:username.value,password:password.value})});
+  let d=await r.json(); document.getElementById("authMsg").innerText=r.ok?d.message:d.detail;
+}
+async function login(){
+  let form=new URLSearchParams(); form.append("username",username.value); form.append("password",password.value);
+  let r=await fetch(API+"/login",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:form});
+  let d=await r.json();
+  if(!r.ok){document.getElementById("authMsg").innerText=d.detail;return}
+  token=d.access_token; localStorage.setItem("token",token); showApp();
+}
+function logout(){localStorage.removeItem("token");location.reload()}
+async function loadAll(){
+  let date=dateInput.value;
+  let s=await fetch(API+"/summary/daily?date="+date,{headers:headers()}); let sd=await s.json();
+  if(s.ok){eaten.innerText=sd.calories_eaten; burned.innerText=sd.calories_burned; net.innerText=sd.net_calories; protein.innerText=sd.protein+"g"}
+  let m=await fetch(API+"/meals?date="+date,{headers:headers()}); let meals=await m.json();
+  mealList.innerHTML=meals.map(x=>`<div class="item"><span>${x.name} - ${x.calories} cal, ${x.protein}g protein</span><button class="red" onclick="delMeal(${x.id})">Delete</button></div>`).join("")||"No meals yet";
+  let w=await fetch(API+"/workouts?date="+date,{headers:headers()}); let works=await w.json();
+  workList.innerHTML=works.map(x=>`<div class="item"><span>${x.name} - ${x.calories_burned} cal, ${x.duration} min</span><button class="red" onclick="delWorkout(${x.id})">Delete</button></div>`).join("")||"No workouts yet";
+}
+async function addMeal(){
+  await fetch(API+"/meals",{method:"POST",headers:headers(),body:JSON.stringify({name:mealName.value,calories:parseInt(mealCal.value),protein:parseInt(mealProtein.value||0),date:dateInput.value})});
+  mealName.value="";mealCal.value="";mealProtein.value=""; loadAll();
+}
+async function addWorkout(){
+  await fetch(API+"/workouts",{method:"POST",headers:headers(),body:JSON.stringify({name:workName.value,calories_burned:parseInt(workCal.value),duration:parseInt(workDur.value||0),date:dateInput.value})});
+  workName.value="";workCal.value="";workDur.value=""; loadAll();
+}
+async function delMeal(id){await fetch(API+"/meals/"+id,{method:"DELETE",headers:headers()});loadAll()}
+async function delWorkout(id){await fetch(API+"/workouts/"+id,{method:"DELETE",headers:headers()});loadAll()}
+</script>
+</body>
+</html>
